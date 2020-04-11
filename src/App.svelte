@@ -15,6 +15,7 @@
       id: 'collatz',
       initial: 'collatzing',
       context: {
+        initValue: 5,
         value: 5,
         history: [5],
       },
@@ -44,6 +45,7 @@
               actions: assign(ctxt => {
                 let initValue = getRandomInt(2, 20);
                 return {
+                  initValue: initValue,
                   value: initValue,
                   history: [initValue]
                 };
@@ -90,11 +92,19 @@
     margin-bottom: 2em;
     font-size: 1.5em;
   }
+
+  #init-value-display {
+    margin-top: 3em;
+  }
   #init-with-value {
     margin-top: 0.6em;
   }
   #init-with-rand {
     margin-top: 0.6em;
+  }
+
+  #init-value-input {
+    width: 5em;
   }
 </style>
 
@@ -109,7 +119,7 @@ n -> n/2
     when n is even
 </pre></code>
 
-<p>Starting from an initial value of <strong>5</strong>:</p>
+<p id="init-value-display">Starting from an initial value of <strong>{machineState.context.initValue}</strong>:</p>
 
 <h2>{machineState.context.value}</h2>
 
@@ -124,7 +134,7 @@ n -> n/2
     <p>process stopped.</p>
     <button id="init-with-rand" on:click={startFromRandom}>initialize with random</button>
     <div id="init-with-value">
-      <input type="text" />
+      <input id="init-value-input" type="text" />
       <button on:click>initialize with value</button>
     </div>
   </div>
