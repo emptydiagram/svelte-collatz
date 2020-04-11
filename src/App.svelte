@@ -181,6 +181,10 @@
 
   <div id="collatz-display">
     <p id="init-value-display">Starting from an initial value of <strong>{machineState.context.initValue}</strong>:</p>
+    {#if isFinished}
+      <p>reached 1 and stopped.</p>
+    {/if}
+
 
     <p id="current-value">{machineState.context.value}</p>
 
@@ -198,13 +202,8 @@
 
   <button id="init-with-rand" on:click={startFromRandom}>initialize with random</button>
 
-  {#if isFinished}
-    <div>
-      <p>reached 1 and stopped.</p>
-    </div>
-  {/if}
-
-  <p id="start-of-notes">
+  <h2 id="start-of-notes">Notes</h2>
+  <p>
     Notice that whenever it attains the value 1, if we were to apply the update equation, we would get 3*1 + 1 = 4 -> 2 -> 1 -> 4 -> ....
   </p>
 
