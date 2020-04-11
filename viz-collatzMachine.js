@@ -1,6 +1,6 @@
 let initValueText = '4';
 let DEFAULT_INIT_VALUE = 20;
-let RAND_UPPER_BOUND = 100;
+let RAND_UPPER_BOUND = 20;
 
 function getRandInitValue() {
   return getRandomInt(2, RAND_UPPER_BOUND);
