@@ -31,33 +31,36 @@
 
   let initFromText = assign(ctxt => {
     let initValue = parseInt(initValueText);
-    return makeInitContext(initValue);
+    if (!isNaN(initValue)) {
+      return makeInitContext(initValue);
+    }
   });
 
   const collatzingStates = {
     initial: 'running',
     states: {
-        running: {
-          on: {
-            '': {
-              target: 'finished',
-              cond: { type: 'isWalkFinished' }
-            },
-            STEP: {
-              actions: assign(ctxt => {
-                let v = ctxt.value;
-                let newValue = v % 2 === 0 ? v / 2 : 3 * v + 1;
-                return {
-                  value: newValue,
-                  history: [...ctxt.history, newValue],
-                };
-              })
-            },
-          }
-        },
-
-        finished: {
+      running: {
+        on: {
+          '': {
+            target: 'finished',
+            cond: { type: 'isWalkFinished' }
+          },
+          STEP: {
+            actions: assign(ctxt => {
+              let v = ctxt.value;
+              let newValue = v % 2 === 0 ? v / 2 : 3 * v + 1;
+              return {
+                value: newValue,
+                history: [...ctxt.history, newValue],
+              };
+            })
+          },
         }
+      },
+
+      finished: {
+        type: 'final'
+      }
     }
   }
 
@@ -132,6 +135,11 @@
     margin: 5em 0;
   }
 
+  #current-value {
+    font-size: 2em;
+    font-weight: bold;
+  }
+
   #sequence-text {
     font-size: 0.75em;
   }
@@ -174,7 +182,7 @@
   <div id="collatz-display">
     <p id="init-value-display">Starting from an initial value of <strong>{machineState.context.initValue}</strong>:</p>
 
-    <h2>{machineState.context.value}</h2>
+    <p id="current-value">{machineState.context.value}</p>
 
     <div>
       <button disabled={isFinished} on:click={stepCollatzer}>step (apply Col)</button>
