@@ -14,6 +14,24 @@
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  let initFromRandom = assign(ctxt => {
+    let initValue = getRandomInt(2, 20);
+    return {
+      initValue: initValue,
+      value: initValue,
+      history: [initValue]
+    };
+  });
+
+  let initFromText = assign(ctxt => {
+    let initValue = parseInt(initValueText);
+    return {
+      initValue: initValue,
+      value: initValue,
+      history: [initValue]
+    };
+  });
+
   const collatzMachine = Machine(
     {
       id: 'collatz',
@@ -46,14 +64,11 @@
           on: {
             RAND_INIT: {
               target: 'collatzing',
-              actions: assign(ctxt => {
-                let initValue = getRandomInt(2, 20);
-                return {
-                  initValue: initValue,
-                  value: initValue,
-                  history: [initValue]
-                };
-              })
+              actions: initFromRandom
+            },
+            INIT_FROM_VALUE: {
+              target: 'collatzing',
+              actions: initFromText
             },
           }
         }
@@ -82,6 +97,9 @@
   function startFromRandom() {
     collatzService.send('RAND_INIT');
   }
+  function startFromTextInput() {
+    collatzService.send('INIT_FROM_VALUE');
+  }
 
 </script>
 
@@ -101,8 +119,6 @@
     font-size: 1.5em;
   }
 
-  #init-value-display {
-  }
   #init-with-value {
     margin-top: 0.6em;
   }
@@ -145,14 +161,15 @@
     <p id="trace">sequence: [{machineState.context.history.join()}]</p>
   </div>
 
+  <button id="init-with-rand" on:click={startFromRandom}>initialize with random</button>
+  <div id="init-with-value">
+    <input id="init-value-input" type="text" bind:value={initValueText}/>
+    <button on:click={startFromTextInput}>initialize with value</button>
+  </div>
+
   {#if isFinished}
     <div>
       <p>reached 1 and stopped.</p>
-      <button id="init-with-rand" on:click={startFromRandom}>initialize with random</button>
-      <div id="init-with-value">
-        <input id="init-value-input" type="text" />
-        <button on:click>initialize with value</button>
-      </div>
     </div>
   {/if}
 
