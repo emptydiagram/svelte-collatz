@@ -2,54 +2,80 @@
   import { Machine, interpret, assign } from 'xstate';
 	export let name;
 
-  const counterMachine = Machine({
-    id: 'counter',
-    initial: 'counting',
-    context: {
-      count: 7
-    },
-    states: {
-      counting: {
-        on: {
-          INC: {
-            actions: assign({
-              count: ctxt => ctxt.count + 1,
-            })
-          },
-          DEC: {
-            actions: assign({
-              count: ctxt => ctxt.count - 1,
-            })
-          },
-          RESET: {
-            actions: assign({
-              count: ctxt => 0,
-            })
-          },
+  // Math.random() returns value in [0, 1)
+  // this returns integer in range [min, max]
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const collatzMachine = Machine(
+    {
+      id: 'collatz',
+      initial: 'collatzing',
+      context: {
+        value: 5
+      },
+      states: {
+        collatzing: {
+          on: {
+            '': {
+              target: 'finished',
+              cond: { type: 'isWalkFinished' }
+            },
+            STEP: {
+              actions: assign({
+                value: ctxt => {
+                  let v = ctxt.value;
+                  return v % 2 === 0
+                    ? v / 2
+                    : 3 * v + 1;
+                },
+              })
+            },
+          }
+        },
+        finished: {
+          on: {
+            RAND_INIT: {
+              target: 'collatzing',
+              actions: assign({
+                value: ctxt => {
+                  return getRandomInt(2, 20);
+                },
+              })
+            },
+          }
         }
       }
     },
-  });
+    {
+      guards: {
+        isWalkFinished: (context, event) => context.value == 1
+      },
+    }
+  );
 
-  const counterService = interpret(counterMachine);
+  const collatzService = interpret(collatzMachine);
 
-  let machineState = null;
-  counterService.onTransition(state => {
-    console.log("transitioning to context = ", state.context);
+  let machineState = collatzMachine.initialState;
+  collatzService.onTransition(state => {
+    console.log("transitioning to context = ", state.context, ", state = ", state.value);
     machineState = state;
   });
 
-  counterService.start();
+  collatzService.start();
 
-  function incCounter() {
-    counterService.send('INC');
+  function stepCollatzer() {
+    collatzService.send('STEP');
   }
-  function decCounter() {
-    counterService.send('DEC');
+  function startFromRandom() {
+    collatzService.send('RAND_INIT');
   }
-  function resetCounter() {
-    counterService.send('RESET');
-  }
+
+  $: isFinished = machineState.value === 'finished';
+
 
 </script>
 
@@ -57,17 +83,21 @@
 	h1 {
 		color: purple;
 	}
+
 </style>
 
 <h1>Hello {name}!</h1>
 
-<div>
-  <button on:click={resetCounter}>reset</button>
-</div>
-
-<h2>{machineState.context.count}</h2>
+<h2>{machineState.context.value}</h2>
 
 <div>
-  <button on:click={incCounter}>inc</button>
-  <button on:click={decCounter}>dec</button>
+  <button disabled={isFinished} on:click={stepCollatzer}>step</button>
 </div>
+
+{#if isFinished}
+  <div>
+    <p>process stopped</p>
+    <button on:click={startFromRandom}>initialize with random</button>
+  </div>
+{/if}
+
