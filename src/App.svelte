@@ -2,15 +2,6 @@
   import { Machine, interpret, assign } from 'xstate';
 	export let name;
 
-  let counter = 0;
-  function incCounter() {
-    counter += 1;
-  }
-  function decCounter() {
-    counter -= 1;
-  }
-
-
   const counterMachine = Machine({
     id: 'counter',
     initial: 'counting',
@@ -30,6 +21,11 @@
               count: ctxt => ctxt.count - 1,
             })
           },
+          RESET: {
+            actions: assign({
+              count: ctxt => 0,
+            })
+          },
         }
       }
     },
@@ -44,13 +40,17 @@
   });
 
   counterService.start();
-  counterService.send('INC');
-  counterService.send('INC');
-  counterService.send('INC');
-  counterService.send('DEC');
-  counterService.send('INC');
-  counterService.stop();
-  console.log(machineState);
+
+  function incCounter() {
+    counterService.send('INC');
+  }
+  function decCounter() {
+    counterService.send('DEC');
+  }
+  function resetCounter() {
+    counterService.send('RESET');
+  }
+
 </script>
 
 <style>
@@ -61,7 +61,11 @@
 
 <h1>Hello {name}!</h1>
 
-<h2>{ counter }</h2>
+<div>
+  <button on:click={resetCounter}>reset</button>
+</div>
+
+<h2>{machineState.context.count}</h2>
 
 <div>
   <button on:click={incCounter}>inc</button>
