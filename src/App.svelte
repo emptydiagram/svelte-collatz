@@ -1,6 +1,10 @@
 <script>
   import { Machine, interpret, assign } from 'xstate';
-	export let name;
+
+  let initValueText;
+  $: isFinished = machineState.value === 'finished';
+  let DEFAULT_INIT_VALUE = 5;
+
 
   // Math.random() returns value in [0, 1)
   // this returns integer in range [min, max]
@@ -15,9 +19,9 @@
       id: 'collatz',
       initial: 'collatzing',
       context: {
-        initValue: 5,
-        value: 5,
-        history: [5],
+        initValue: DEFAULT_INIT_VALUE,
+        value: DEFAULT_INIT_VALUE,
+        history: [DEFAULT_INIT_VALUE],
       },
       states: {
         collatzing: {
@@ -79,9 +83,6 @@
     collatzService.send('RAND_INIT');
   }
 
-  $: isFinished = machineState.value === 'finished';
-
-
 </script>
 
 <style>
@@ -92,13 +93,15 @@
   h1 {
   }
 
+  #collatz-display {
+    margin: 5em 0;
+  }
+
   #trace {
-    margin-bottom: 5em;
     font-size: 1.5em;
   }
 
   #init-value-display {
-    margin-top: 3em;
   }
   #init-with-value {
     margin-top: 0.6em;
@@ -130,15 +133,17 @@
 
   <p>Consider the sequence of values obtained by repeatedly applying the update function: (N, Col(N), Col(Col(N)), Col(Col(Col((N))), ...)</p>
 
-  <p id="init-value-display">Starting from an initial value of <strong>{machineState.context.initValue}</strong>:</p>
+  <div id="collatz-display">
+    <p id="init-value-display">Starting from an initial value of <strong>{machineState.context.initValue}</strong>:</p>
 
-  <h2>{machineState.context.value}</h2>
+    <h2>{machineState.context.value}</h2>
 
-  <div>
-    <button disabled={isFinished} on:click={stepCollatzer}>step (apply Col)</button>
+    <div>
+      <button disabled={isFinished} on:click={stepCollatzer}>step (apply Col)</button>
+    </div>
+
+    <p id="trace">sequence: [{machineState.context.history.join()}]</p>
   </div>
-
-  <p id="trace">sequence: [{machineState.context.history.join()}]</p>
 
   {#if isFinished}
     <div>
