@@ -156,4 +156,9 @@
   </p>
 
   <p>The Collatz conjecture: for every positive integer n, when repeatedly updated using the update equations starting from n, it eventually attains 1 in its sequence of values.</p>
+
+  <h3>External links</h3>
+  <p><a href="http://www.ericr.nl/wondrous/">On the 3x + 1 problem</a></p>
+  <p>"In 2017 the yoyo@home project checked all numbers up to 87.2<sup>60</sup> (± 1.003E+20) for convergence."</p>
+  <p><a href="https://terrytao.wordpress.com/2019/09/10/almost-all-collatz-orbits-attain-almost-bounded-values/">Almost all Collatz orbits attain almost bounded values</a></p>
 </div>
