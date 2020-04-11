@@ -3,7 +3,12 @@
 
   let initValueText;
   $: isFinished = machineState.value === 'finished';
-  let DEFAULT_INIT_VALUE = 5;
+  let DEFAULT_INIT_VALUE = 20;
+  let RAND_UPPER_BOUND = 100;
+
+  function getRandInitValue() {
+    return getRandomInt(2, RAND_UPPER_BOUND);
+  }
 
 
   // Math.random() returns value in [0, 1)
@@ -15,7 +20,7 @@
   }
 
   let initFromRandom = assign(ctxt => {
-    let initValue = getRandomInt(2, 20);
+    let initValue = getRandInitValue();
     return {
       initValue: initValue,
       value: initValue,
@@ -57,6 +62,14 @@
                   history: [...ctxt.history, newValue],
                 };
               })
+            },
+            RAND_INIT: {
+              target: 'collatzing',
+              actions: initFromRandom
+            },
+            INIT_FROM_VALUE: {
+              target: 'collatzing',
+              actions: initFromText
             },
           }
         },
@@ -133,6 +146,11 @@
   #start-of-notes {
     margin-top: 5em;
   }
+
+  /* TODO */
+  #sequence-of-values {
+    font-size: 2em;
+  }
 </style>
 
 
@@ -158,14 +176,16 @@
       <button disabled={isFinished} on:click={stepCollatzer}>step (apply Col)</button>
     </div>
 
-    <p id="trace">sequence: [{machineState.context.history.join()}]</p>
+    <p id="trace">sequence:</p>
+    <p id="sequence-of-values">[{machineState.context.history.join(', ')}]</p>
   </div>
 
-  <button id="init-with-rand" on:click={startFromRandom}>initialize with random</button>
   <div id="init-with-value">
     <input id="init-value-input" type="text" bind:value={initValueText}/>
     <button on:click={startFromTextInput}>initialize with value</button>
   </div>
+
+  <button id="init-with-rand" on:click={startFromRandom}>initialize with random</button>
 
   {#if isFinished}
     <div>
