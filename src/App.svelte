@@ -40,14 +40,14 @@
   const collatzMachine = Machine(
     {
       id: 'collatz',
-      initial: 'collatzing',
+      initial: 'running',
       context: {
         initValue: DEFAULT_INIT_VALUE,
         value: DEFAULT_INIT_VALUE,
         history: [DEFAULT_INIT_VALUE],
       },
       states: {
-        collatzing: {
+        running: {
           on: {
             '': {
               target: 'finished',
@@ -64,11 +64,11 @@
               })
             },
             RAND_INIT: {
-              target: 'collatzing',
+              target: 'running',
               actions: initFromRandom
             },
             INIT_FROM_VALUE: {
-              target: 'collatzing',
+              target: 'running',
               actions: initFromText
             },
           }
@@ -76,11 +76,11 @@
         finished: {
           on: {
             RAND_INIT: {
-              target: 'collatzing',
+              target: 'running',
               actions: initFromRandom
             },
             INIT_FROM_VALUE: {
-              target: 'collatzing',
+              target: 'running',
               actions: initFromText
             },
           }
