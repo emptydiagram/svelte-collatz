@@ -2,7 +2,6 @@
   import { Machine, interpret, assign } from 'xstate';
 
   let initValueText;
-  $: isFinished = machineState.value === 'finished';
   let DEFAULT_INIT_VALUE = 20;
   let RAND_UPPER_BOUND = 100;
 
@@ -19,34 +18,25 @@
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  let initFromRandom = assign(ctxt => {
-    let initValue = getRandInitValue();
-    return {
+  let makeInitContext = initValue => ({
       initValue: initValue,
       value: initValue,
       history: [initValue]
-    };
+  });
+
+  let initFromRandom = assign(ctxt => {
+    let initValue = getRandInitValue();
+    return makeInitContext(initValue);
   });
 
   let initFromText = assign(ctxt => {
     let initValue = parseInt(initValueText);
-    return {
-      initValue: initValue,
-      value: initValue,
-      history: [initValue]
-    };
+    return makeInitContext(initValue);
   });
 
-  const collatzMachine = Machine(
-    {
-      id: 'collatz',
-      initial: 'running',
-      context: {
-        initValue: DEFAULT_INIT_VALUE,
-        value: DEFAULT_INIT_VALUE,
-        history: [DEFAULT_INIT_VALUE],
-      },
-      states: {
+  const collatzingStates = {
+    initial: 'running',
+    states: {
         running: {
           on: {
             '': {
@@ -63,27 +53,36 @@
                 };
               })
             },
-            RAND_INIT: {
-              target: 'running',
-              actions: initFromRandom
-            },
-            INIT_FROM_VALUE: {
-              target: 'running',
-              actions: initFromText
-            },
           }
         },
+
         finished: {
+        }
+    }
+  }
+
+  const collatzMachine = Machine(
+    {
+      id: 'collatz',
+      initial: 'collatzing',
+      context: {
+        initValue: DEFAULT_INIT_VALUE,
+        value: DEFAULT_INIT_VALUE,
+        history: [DEFAULT_INIT_VALUE],
+      },
+      states: {
+        collatzing: {
           on: {
             RAND_INIT: {
-              target: 'running',
+              target: 'collatzing.running',
               actions: initFromRandom
             },
             INIT_FROM_VALUE: {
-              target: 'running',
+              target: 'collatzing.running',
               actions: initFromText
             },
-          }
+          },
+          ...collatzingStates
         }
       }
     },
@@ -114,6 +113,11 @@
     collatzService.send('INIT_FROM_VALUE');
   }
 
+
+  /* for display */
+  // console.log("machineState = ", machineState);
+  $: isFinished = machineState.value.collatzing === 'finished';
+
 </script>
 
 <style>
@@ -128,8 +132,8 @@
     margin: 5em 0;
   }
 
-  #trace {
-    font-size: 1.5em;
+  #sequence-text {
+    font-size: 0.75em;
   }
 
   #init-with-value {
@@ -176,8 +180,7 @@
       <button disabled={isFinished} on:click={stepCollatzer}>step (apply Col)</button>
     </div>
 
-    <p id="trace">sequence:</p>
-    <p id="sequence-of-values">[{machineState.context.history.join(', ')}]</p>
+    <p id="sequence-of-values"><span id="sequence-text">sequence:</span> [{machineState.context.history.join(', ')}]</p>
   </div>
 
   <div id="init-with-value">
