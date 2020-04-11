@@ -85,11 +85,15 @@
 </script>
 
 <style>
+  #page {
+    max-width: 35em;
+  }
+
   h1 {
   }
 
   #trace {
-    margin-bottom: 2em;
+    margin-bottom: 5em;
     font-size: 1.5em;
   }
 
@@ -106,36 +110,50 @@
   #init-value-input {
     width: 5em;
   }
+
+  #start-of-notes {
+    margin-top: 5em;
+  }
 </style>
 
 
-<h1>Collatz problem</h1>
-<p>given these update equations:</p>
+<div id="page">
+  <h1>Collatz problem</h1>
+  <p>update function, Col, defined by these update equations:</p>
 
-<code><pre>
-n -> 3*n + 1
-    when n is odd
-n -> n/2
-    when n is even
-</pre></code>
+  <code><pre>
+  n -> 3*n + 1
+      when n is odd
+  n -> n/2
+      when n is even
+  </pre></code>
 
-<p id="init-value-display">Starting from an initial value of <strong>{machineState.context.initValue}</strong>:</p>
+  <p>Consider the sequence of values obtained by repeatedly applying the update function: (N, Col(N), Col(Col(N)), Col(Col(Col((N))), ...)</p>
 
-<h2>{machineState.context.value}</h2>
+  <p id="init-value-display">Starting from an initial value of <strong>{machineState.context.initValue}</strong>:</p>
 
-<div>
-  <button disabled={isFinished} on:click={stepCollatzer}>step</button>
-</div>
+  <h2>{machineState.context.value}</h2>
 
-<p id="trace">[{machineState.context.history.join()}]</p>
-
-{#if isFinished}
   <div>
-    <p>process stopped.</p>
-    <button id="init-with-rand" on:click={startFromRandom}>initialize with random</button>
-    <div id="init-with-value">
-      <input id="init-value-input" type="text" />
-      <button on:click>initialize with value</button>
-    </div>
+    <button disabled={isFinished} on:click={stepCollatzer}>step (apply Col)</button>
   </div>
-{/if}
+
+  <p id="trace">sequence: [{machineState.context.history.join()}]</p>
+
+  {#if isFinished}
+    <div>
+      <p>reached 1 and stopped.</p>
+      <button id="init-with-rand" on:click={startFromRandom}>initialize with random</button>
+      <div id="init-with-value">
+        <input id="init-value-input" type="text" />
+        <button on:click>initialize with value</button>
+      </div>
+    </div>
+  {/if}
+
+  <p id="start-of-notes">
+    Notice that whenever it attains the value 1, if we were to apply the update equation, we would get 3*1 + 1 = 4 -> 2 -> 1 -> 4 -> ....
+  </p>
+
+  <p>The Collatz conjecture: for every positive integer n, when repeatedly updated using the update equations starting from n, it eventually attains 1 in its sequence of values.</p>
+</div>
