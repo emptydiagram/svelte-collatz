@@ -131,6 +131,10 @@
   h1 {
   }
 
+  #update-fn {
+    font-size: 1.2em;
+  }
+
   #collatz-display {
     margin: 5em 0;
   }
@@ -170,12 +174,12 @@
   <h1>Collatz problem</h1>
   <p>update function, Col, defined by these update equations:</p>
 
-  <code><pre>
+  <pre id="update-fn"><code>
   n -> 3*n + 1
       when n is odd
   n -> n/2
       when n is even
-  </pre></code>
+  </code></pre>
 
   <p>Consider the sequence of values obtained by repeatedly applying the update function: (N, Col(N), Col(Col(N)), Col(Col(Col((N))), ...)</p>
 
